@@ -43,11 +43,18 @@ Method %ShowContentsHead(pZenOutput As %Boolean = 0)
 /// The content should match the type returned by the <method>%GetContentType</method> method.<br>
 Method %ShowContents(pZenOutput As %Boolean = 0)
 {
-	set jsonObject = ..GetObjectJson()
+	set jsonObject = ..GetObjectJson() 
+	If $IsObject(%request)&&(%request.Get("FORMAT")'="") {
+		#; JSON is formatted by default; the browser’s pretty-print is optional.
+		Set formatter = ##class(%JSON.Formatter).%New()
+		Do formatter.Format(jsonObject)
+	}
+	else {
 	set test = {"client":{"firstName":"James","lastName":"Bond","city":{"name":"London","zipCode":"E1 6AN"},"pets":[{"name":"Kitty","category":"cat","color":"white","age":2},{"name":"Craig","category":"cat","color":"grey","age":3}]}}
 	// https://github.com/bazh/jquery.json-view
 	&html<<div id="element"></div>>
 	&html<<script>$(function() {$('#element').jsonView(JSON.stringify(#(jsonObject)#));});</script>>
+	}
 	#; &html<<script>$(function() {$('#element').jsonView(JSON.stringify(#(test.%ToJSON())#));});</script>>
 }
 
